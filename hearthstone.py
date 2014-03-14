@@ -46,8 +46,12 @@ class HSArenaLogger(webapp2.RequestHandler):
         else:
             counter = counters[0]
         rd = random.randint(0,8)
-        counter.winCountList[rd] += 1
-        counter.totalCountList[rd] += 1
+        #TODO wrong code here
+        roleType = int(self.request.get('roleType'))
+        isWin  =self.request.get('isWin')
+        counter.winCountList[roleType] += 1
+        if isWin == 'true':
+            counter.totalCountList[roleType] += 1
         counter.put()
         self.redirect('/logArena')
 

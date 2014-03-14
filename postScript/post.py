@@ -1,9 +1,19 @@
 import requests
-payload = {'roleType' : '2', 'isWin' : 'false'}
+import sys
 
-for i in range(1,50):
-    r= requests.post("http://localhost:9080/logArena",data=payload)
+url = ''
 
+if len(sys.argv) == 1:
+    url = "http://localhost:9080/logArena"
+elif sys.argv[1] == 'server':
+    url = "http://hearthstonewr.appspot.com/logArena"
 
-r = requests.get("http://localhost:9080/logArena")
+payload = {'roleType': '2', 'isWin': 'false'}
+
+for i in range(1, 50):
+    print(url)
+    r = requests.post(url, data=payload)
+    print(r.text)
+
+r = requests.get(url)
 print(r.text)
