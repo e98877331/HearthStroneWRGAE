@@ -49,21 +49,22 @@ class HSArenaLogger(webapp2.RequestHandler):
         #self.response.write(MAIN_HTML)
 
     def post(self):
-        roleType = self.request.get('roleType')
-        counter = ArenaGameCounter.get_by_id(roleType)
-
-        
-        if counter is None:
-            counter = ArenaGameCounter(id=roleType)
+        counterq = ArenaGameCounter.query()
+        counters = counterq.fetch(1)
+        if not counters:
+            counter = ArenaGameCounter(id=DEFAULT_DATA_SET)
             counter.winCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
             counter.totalCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        else:
+            counter = counters[0]
         #TODO wrong code here
-        vsRoleType = int(self.request.get('vsRoleType'))
-        isWin = self.request.get('isWin')
+        roleType = self.request.get('roleType')
+        roleType = int(roleType)
 
-        counter.totalCountList[vsRoleType] += 1
+        isWin = self.request.get('isWin')
+        counter.totalCountList[roleType] += 1
         if isWin == 'true':
-            counter.winCountList[vsRoleType] += 1
+            counter.winCountList[roleType] += 1
         counter.put()
         self.redirect('/logArena')
 

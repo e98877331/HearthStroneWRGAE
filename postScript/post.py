@@ -9,11 +9,11 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == 'server':
     url = "http://hearthstonewr.appspot.com/logArena"
 
-
-
-for i in range(1, 52):
+for i in range(1, 10):
     print(url)
-    payload = {'roleType': random.randint(0,8) , 'isWin': 'false'}
+    payload = {'roleType': random.randint(0, 8), 'isWin':
+               random.choice(['true', 'false']),
+               'vsRoleType': random.randint(0, 8)}
     r = requests.post(url, data=payload)
     print(r.text)
 
