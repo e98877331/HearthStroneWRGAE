@@ -1,5 +1,6 @@
 import requests
 import sys
+import random
 
 url = ''
 
@@ -8,12 +9,13 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == 'server':
     url = "http://hearthstonewr.appspot.com/logArena"
 
-payload = {'roleType': '2', 'isWin': 'false'}
 
-for i in range(1, 50):
+
+for i in range(1, 52):
     print(url)
+    payload = {'roleType': random.randint(0,8) , 'isWin': 'false'}
     r = requests.post(url, data=payload)
     print(r.text)
 
-r = requests.get(url)
+#r = requests.get(url)
 print(r.text)

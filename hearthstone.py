@@ -1,5 +1,5 @@
 import webapp2
-import random
+import json
 from google.appengine.ext import ndb
 
 
@@ -24,17 +24,29 @@ MAIN_HTML = """\
       </div>
     """
 
+
 class HSArenaLogger(webapp2.RequestHandler):
 
     def get(self):
         counterq = ArenaGameCounter.query()
-        counters = counterq.fetch()
-        for idx, counter in enumerate(counters):
-           # self.response.write('wtf dd')
-            self.response.write('counter ' + str(idx) +' :content<br />')
-            self.response.write("win: " + str(counter.winCountList) +' <br />')
-            self.response.write("total: " + str(counter.totalCountList) +' <br />')
-        self.response.write(MAIN_HTML)
+        counters = counterq.fetch(1)
+        self.response.content_type = 'application/json'
+        obj = None
+        print(repr(counters))
+        if counters is not None:
+            counter = counters[0]
+            obj = {'winCountList': counter.winCountList,
+                   'totalCountList': counter.totalCountList}
+        else:
+            obj = {'winCountList': [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                   'totalCountList': [0, 0, 0, 0, 0, 0, 0, 0, 0]}
+        self.response.write(json.dumps(obj))
+        #for idx, counter in enumerate(counters):
+        #   # self.response.write('wtf dd')
+        #   self.response.write('counter ' + str(idx) +' :content<br />')
+        #   self.response.write("win: " + str(counter.winCountList) +' <br />')
+        #   self.response.write("total: " + str(counter.totalCountList) +' <br />')
+        #self.response.write(MAIN_HTML)
 
     def post(self):
         counterq = ArenaGameCounter.query()
@@ -45,13 +57,14 @@ class HSArenaLogger(webapp2.RequestHandler):
             counter.totalCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         else:
             counter = counters[0]
-        rd = random.randint(0,8)
         #TODO wrong code here
-        roleType = int(self.request.get('roleType'))
-        isWin  =self.request.get('isWin')
-        counter.winCountList[roleType] += 1
+        roleType = self.request.get('roleType')
+        roleType = int(roleType)
+
+        isWin = self.request.get('isWin')
+        counter.totalCountList[roleType] += 1
         if isWin == 'true':
-            counter.totalCountList[roleType] += 1
+            counter.winCountList[roleType] += 1
         counter.put()
         self.redirect('/logArena')
 
