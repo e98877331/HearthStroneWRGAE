@@ -5,8 +5,9 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /logArena
+- url: /logArena.*
   script: hearthstone.application
+
 - url: /.*
   script: helloworld.application
 

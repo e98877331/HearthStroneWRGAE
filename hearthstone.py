@@ -1,5 +1,6 @@
 import webapp2
 import json
+import logging
 from google.appengine.ext import ndb
 
 
@@ -25,11 +26,31 @@ MAIN_HTML = """\
     """
 
 
+def initAll():
+    for i in range(0, 9):
+        counter = ArenaGameCounter.get_by_id(str(i))
+        logging.debug("iiiiiiiiiiiiiiiiiiiiiii %s", str(counter))
+
+        if counter is None:
+            counter = ArenaGameCounter(id=str(i))
+            counter.winCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            counter.totalCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            counter.put()
+
+
+class ArenaInitializer(webapp2.RequestHandler):
+    def get(self):
+        self.response.write('hello world')
+
+    def post(self):
+        initAll()
+
 class HSArenaLogger(webapp2.RequestHandler):
 
     def get(self):
         counterq = ArenaGameCounter.query()
-        counters = counterq.fetch(1)
+        counters = counterq.fetch()
+
         self.response.content_type = 'application/json'
         obj = None
         print(repr(counters))
@@ -49,15 +70,19 @@ class HSArenaLogger(webapp2.RequestHandler):
         #self.response.write(MAIN_HTML)
 
     def post(self):
+        
+        counterq = ArenaGameCounter.query()
+        counters = counterq.fetch()
+        if len(counters) < 9:
+            initAll()
+        
+        
         roleType = self.request.get('roleType')
         counter = ArenaGameCounter.get_by_id(roleType)
-
-        
-        if counter is None:
-            counter = ArenaGameCounter(id=roleType)
-            counter.winCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-            counter.totalCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        #TODO wrong code here
+        #if counter is None:
+        #    counter = ArenaGameCounter(id=roleType)
+        #    counter.winCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        #    counter.totalCountList = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         vsRoleType = int(self.request.get('vsRoleType'))
         isWin = self.request.get('isWin')
 
@@ -69,4 +94,5 @@ class HSArenaLogger(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
     ('/logArena', HSArenaLogger),
+    ('/logArena/init', ArenaInitializer),
 ], debug=True)
