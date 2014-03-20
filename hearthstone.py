@@ -43,7 +43,9 @@ class ArenaInitializer(webapp2.RequestHandler):
         self.response.write('hello world')
 
     def post(self):
-        initAll()
+        if self.response.get('ApiKey') == 'towolf':
+            initAll()
+
 
 class HSArenaLogger(webapp2.RequestHandler):
 
@@ -53,15 +55,14 @@ class HSArenaLogger(webapp2.RequestHandler):
 
         self.response.content_type = 'application/json'
         obj = None
-        print(repr(counters))
-        if counters is not None:
-            counter = counters[0]
-            obj = {'winCountList': counter.winCountList,
-                   'totalCountList': counter.totalCountList}
-        else:
-            obj = {'winCountList': [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                   'totalCountList': [0, 0, 0, 0, 0, 0, 0, 0, 0]}
-        self.response.write(json.dumps(obj))
+        objs = [];
+        #print(repr(counters))
+        for idx, counter in enumerate(counters):
+            obj = {'roleType': idx,
+                   'vsWinCountList': counter.winCountList,
+                   'vsTotalCountList': counter.totalCountList}
+            objs.append(obj)
+        self.response.write(json.dumps(objs))
         #for idx, counter in enumerate(counters):
         #   # self.response.write('wtf dd')
         #   self.response.write('counter ' + str(idx) +' :content<br />')
@@ -70,13 +71,11 @@ class HSArenaLogger(webapp2.RequestHandler):
         #self.response.write(MAIN_HTML)
 
     def post(self):
-        
         counterq = ArenaGameCounter.query()
         counters = counterq.fetch()
         if len(counters) < 9:
             initAll()
-        
-        
+
         roleType = self.request.get('roleType')
         counter = ArenaGameCounter.get_by_id(roleType)
         #if counter is None:

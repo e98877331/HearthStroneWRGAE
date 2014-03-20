@@ -9,13 +9,14 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == 'server':
     url = "http://hearthstonewr.appspot.com/logArena"
 elif sys.argv[1] == 'init':
+    payload = {'ApiKey': 'towolf'}
     url = "http://localhost:9080/logArena/init"
     r = requests.post(url)
     print(r.text)
     exit(0)
 
 
-for i in range(1, 10):
+for i in range(1, 50):
     print(url)
     payload = {'roleType': random.randint(0, 8), 'isWin':
                random.choice(['true', 'false']),
